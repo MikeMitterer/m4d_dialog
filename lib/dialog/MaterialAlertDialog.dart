@@ -26,7 +26,7 @@ class MaterialAlertDialog extends MaterialDialog {
 
     // - EventHandler -----------------------------------------------------------------------------
 
-    void onClose() {
+    void _onClose() {
         _logger.info("onClose");
         close(MdlDialogStatus.OK);
     }
@@ -49,4 +49,12 @@ class MaterialAlertDialog extends MaterialDialog {
           </div>
         </div>
         """;
+
+    @override
+    Map<String, Function> get events {
+        return <String,Function>{
+            "onClose" :  () => _onClose()
+        };
+    }
+
 }

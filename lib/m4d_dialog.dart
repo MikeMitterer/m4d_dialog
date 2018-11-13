@@ -43,10 +43,11 @@ import "package:m4d_components/m4d_components.dart";
 import 'package:m4d_template/m4d_template.dart';
 //import "package:m4d_components/m4d_formatter.dart";
 
-import 'package:m4d_flux/m4d_flux.dart';
-export 'package:m4d_flux/m4d_flux.dart';
+//import 'package:m4d_flux/m4d_flux.dart';
+//export 'package:m4d_flux/m4d_flux.dart';
 
-import 'm4d_animation.dart';
+import 'package:m4d_animation/m4d_animation.dart';
+import 'package:m4d_translate/m4d_translate.dart';
 
 //import 'directive/components/interfaces/stores.dart';
 //import 'services.dart' as service;
@@ -78,6 +79,9 @@ class DialogModule extends ioc.IOCModule {
 //        ioc.IOCContainer().bind(service.SimpleValueStore).to(_store);
     }
 
-//    @override
-//    List<ioc.IOCModule> get dependsOn => [ FormatterModule() ];
+    @override
+    List<ioc.IOCModule> get dependsOn => [
+        CoreComponentsModule(),
+        TranslationModule()
+    ];
 }

@@ -1,0 +1,28 @@
+{
+   "@@last_modified": "2018-11-13T13:10:20.277620",
+   "Testmessage": "Testmessage",
+   "@Testmessage": {
+      "type": "text",
+      "placeholders": {}
+   },
+   "Mango #[counter] (Fruit)": "Mango #[counter] (Fruit)",
+   "@Mango #[counter] (Fruit)": {
+      "type": "text",
+      "placeholders": {}
+   },
+   "I buy it!": "I buy it!",
+   "@I buy it!": {
+      "type": "text",
+      "placeholders": {}
+   },
+   "Not now": "Not now",
+   "@Not now": {
+      "type": "text",
+      "placeholders": {}
+   },
+   "Form-Sample": "Form-Sample",
+   "@Form-Sample": {
+      "type": "text",
+      "placeholders": {}
+   }
+}

@@ -13,10 +13,10 @@ import "package:m4d_dialog_sample/customdialog1.dart";
 import "package:m4d_dialog_sample/customdialog2.dart";
 
 // For Date- and TimePicker
+import 'package:l10n/l10n.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/intl_browser.dart';
-import 'package:intl/date_symbol_data_local.dart';
-import 'package:l10n/l10n.dart';
+import 'package:m4d_dialog_sample/_l10n/messages_all.dart';
 
 ///// Simple Translation-Table for testing (see L10N for more)
 //final L10NTranslate translate = new L10NTranslate.withTranslations( {
@@ -64,22 +64,25 @@ class Application extends MaterialApplication {
 
         btnAlertDialog.onClick.listen((_) {
             _logger.info("Click on AlertButton");
-            alertDialog("Testmessage").show().then((final MdlDialogStatus status) {
+            alertDialog(l10n("Testmessage")).show().then((final MdlDialogStatus status) {
                 _logger.info(status);
             });
         });
 
         btnConfirmDialog.onClick.listen((_) {
             _logger.info("Click on ConfirmButton");
-            confirmDialog("Testmessage").show().then((final MdlDialogStatus status) {
+            confirmDialog(l10n("Testmessage")).show().then((final MdlDialogStatus status) {
                 _logger.info(status);
             });
         });
 
         btnCustomDialog1.onClick.listen((_) {
             _logger.info("Click on ConfirmButton");
-            customDialog1(title: "Mango #${_mangoCounter} (Fruit)",
-                yesButton: "I buy it!", noButton: "Not now").show().then((final MdlDialogStatus status) {
+            customDialog1(
+                title: l10n("Mango #[counter] (Fruit)",{ "counter" : _mangoCounter }),
+                yesButton: l10n("I buy it!"),
+                noButton: l10n("Not now"))
+                    .show().then((final MdlDialogStatus status) {
 
                 _logger.info(status);
                 _mangoCounter++;
@@ -88,7 +91,8 @@ class Application extends MaterialApplication {
 
         btnCustomDialog2.onClick.listen((_) {
             _logger.info("Click on ConfirmButton");
-            customDialog2(title: "Form-Sample").show().then((final MdlDialogStatus status) {
+            customDialog2(
+                title: l10n("Form-Sample")).show().then((final MdlDialogStatus status) {
 
                 _logger.info(status);
                 if(status == MdlDialogStatus.OK) {
@@ -173,35 +177,21 @@ class Application extends MaterialApplication {
 }
 
 main() async {
-    final Logger _logger = new Logger('dialog.main');
-    
     configLogging(show: Level.INFO);
 
+    // initLanguageSettings checks the browser url if it finds
+    // a "lang" query param and sets the locale accordingly
+    final String locale = await initLanguageSettings(
+            () => findSystemLocale(),
+            (final String locale) => initializeMessages(locale)
+    );
+    (dom.querySelector("head") as dom.HeadElement).lang = locale;
+
+    // Initialize M4D
     ioc.IOCContainer.bindModules([
-        CoreComponentsModule(),
         DialogModule()
     ]).bind(coreService.Application).to(Application());
 
-    // Determine your locale automatically:
-//    final String locale = await findSystemLocale();
-//    translate.locale = Intl.shortLocale(locale);
-
-//    Intl.defaultLocale = locale;
-//    initializeDateFormatting(locale);
-
-
-//    _logger.info("Locale: $locale / (Short) ${Intl.shortLocale(locale)}");
-
-    final Application app = await componentHandler().run();
+    final Application app = await componentHandler().upgrade();
     app.run();
 }
-
-/**
- * Demo Module
- */
-//class SampleModule extends Module {
-//    configure() {
-//        // Configure Translator
-//        bind(Translator).toInstance(translate);
-//    }
-//}
