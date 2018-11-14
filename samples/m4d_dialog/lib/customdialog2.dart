@@ -49,19 +49,17 @@ class CustomDialog2 extends MaterialDialog {
         return this;
     }
 
-    bool get hasTitle => (title != null && title.isNotEmpty);
-
     // - EventHandler -----------------------------------------------------------------------------
 
-    void onSubmit() {
+    void _onSubmit() {
         close(MdlDialogStatus.OK);
     }
 
-    void onCancel() {
+    void _onCancel() {
         close(MdlDialogStatus.CANCEL);
     }
 
-    Future onClickDate(final dom.Event event) async {
+    Future _onClickDate(final dom.Event event) async {
         event.preventDefault();
         final MaterialDatePicker datePicker = new MaterialDatePicker();
 
@@ -72,17 +70,13 @@ class CustomDialog2 extends MaterialDialog {
         }
     }
     
-    // - private ----------------------------------------------------------------------------------
-
-    //MaterialTextfield get _startDate => MaterialTextfield.widget(dialog.querySelector("#start_date"));
-
-    // - template ----------------------------------------------------------------------------------
+    // - Template ---------------------------------------------------------------------------------
 
     @override
-    String template = """
+    String get template => """
         <div class="mdl-dialog custom-dialog2">
           <div class="mdl-dialog__content">
-            {{#hasTitle}}<h5 class="mdl-color-text--primary-dark">{{title}}</h5>{{/hasTitle}}
+            ${_hasTitle ? '<h5 class="mdl-color-text--primary-dark">${title}</h5>' : ''}
             <div class="mdl-textfield mdl-textfield--floating-label">
                   <input class="mdl-textfield__input" type="text" id="name" mdl-model="name" autofocus>
                   <label class="mdl-textfield__label" for="name">Name</label>
@@ -102,12 +96,26 @@ class CustomDialog2 extends MaterialDialog {
           </div>
           <div class="mdl-dialog__actions">
             <button class="mdl-button" data-mdl-click="onCancel()">
-              {{noButton}}
+              ${noButton}
             </button>
             <button class="mdl-button mdl-button--colored" data-mdl-click="onSubmit()">
-              {{yesButton}}
+              ${yesButton}
             </button>
           </div>
         </div>
         """;
+
+    @override
+    Map<String, Function> get events {
+        return <String,Function>{
+            "onSubmit" :  () => _onSubmit(),
+            "onCancel" :  () => _onCancel(),
+            "onClickDate" : (event) => _onClickDate(event as dom.Event),
+        };
+    }
+
+    // - private ----------------------------------------------------------------------------------
+
+    bool get _hasTitle => (title != null && title.isNotEmpty);
+
 }

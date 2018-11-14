@@ -42,30 +42,23 @@ class CustomDialog1 extends MaterialDialog {
         return this;
     }
 
-    bool get hasTitle => (title != null && title.isNotEmpty);
-
     // - EventHandler -----------------------------------------------------------------------------
 
-    void onYes() {
+    void _onYes() {
         close(MdlDialogStatus.YES);
     }
 
-    void onNo() {
+    void _onNo() {
         close(MdlDialogStatus.NO);
     }
 
-    // - private ----------------------------------------------------------------------------------
-
-    // - template ----------------------------------------------------------------------------------
+    // - Template ----------------------------------------------------------------------------------
 
     @override
-    // language=HTML
-    String template = """
+    String get template => """
         <div class="mdl-dialog custom-dialog1">
           <div class="mdl-dialog__content">
-            {{#hasTitle}}
-            <h5 class="mdl-color-text--primary-dark">{{title}}</h5>
-            {{/hasTitle}}
+            ${_hasTitle ? '<h5 class="mdl-color-text--primary-dark">${title}</h5>' : ''}
             <p>
               The mango is a juicy stone fruit belonging to the genus Mangifera, consisting of numerous tropical fruiting trees,
               cultivated mostly for edible fruit. The majority of these species are found in nature as wild mangoes. They all
@@ -83,12 +76,24 @@ class CustomDialog1 extends MaterialDialog {
           </div>
           <div class="mdl-dialog__actions" layout="row">
               <button class="mdl-button" data-mdl-click="onNo()">
-                  {{noButton}}
+                  ${noButton}
               </button>
               <button class="mdl-button mdl-button--colored" data-mdl-click="onYes()">
-                  {{yesButton}}
+                  ${yesButton}
               </button>
           </div>
         </div>
         """;
+
+    @override
+    Map<String, Function> get events {
+        return <String,Function>{
+            "onNo" :  () => _onNo(),
+            "onYes" :  () => _onYes()
+        };
+    }
+
+    // - private ----------------------------------------------------------------------------------
+
+    bool get _hasTitle => (title != null && title.isNotEmpty);
 }

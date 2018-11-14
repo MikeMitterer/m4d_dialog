@@ -48,18 +48,18 @@ class MaterialTimePicker extends MaterialDialog {
 
     // - EventHandler -----------------------------------------------------------------------------
 
-    void onClose() {
+    void _onClose() {
         _logger.info("onClose");
 
         close(MdlDialogStatus.OK);
     }
 
-    void onCancel() {
+    void _onCancel() {
         _logger.info("onCancel");
         close(MdlDialogStatus.CANCEL);
     }
 
-    void onClickHour(final dom.Event event) {
+    void _onClickHour(final dom.Event event) {
         event.stopPropagation();
 
         final element = event.target as dom.HtmlElement;
@@ -75,7 +75,7 @@ class MaterialTimePicker extends MaterialDialog {
         _hour = hour;
     }
 
-    void onClickMinute(final dom.Event event) {
+    void _onClickMinute(final dom.Event event) {
         event.stopPropagation();
 
         final element = event.target as dom.HtmlElement;
@@ -91,99 +91,26 @@ class MaterialTimePicker extends MaterialDialog {
         _minute = minute;
     }
 
-    void onClickDialogBarHour(final dom.Event event) {
+    void _onClickDialogBarHour(final dom.Event event) {
         event.stopPropagation();
         dialog.classes.removeAll(_showMinuteViewClasses);
     }
 
-    void onClickDialogBarMinute(final dom.Event event) {
+    void _onClickDialogBarMinute(final dom.Event event) {
         event.stopPropagation();
         dialog.classes.addAll(_showMinuteViewClasses);
     }
 
-    // - private ----------------------------------------------------------------------------------
-
-    List<String> get _selectedHourClasses => <String>["mdl-color--accent", "mdl-color-text--accent-contrast"];
-    List<String> get _showMinuteViewClasses => <String>["show-minute-view"];
-
-    String get _selectedHourPrefixClass => "mdl-timepicker__hours--";
-    String get _selectedMinutePrefixClass => "mdl-timepicker__minutes--";
-
-    dom.HtmlElement get _elementHour => dialog.querySelector(".mdl-timepicker__time--hour");
-    dom.SpanElement get _elementMinute => dialog.querySelector(".mdl-timepicker__time--minute");
-    dom.HtmlElement get _elementHours => dialog.querySelector(".mdl-timepicker__hours");
-    dom.HtmlElement get _elementMinutes => dialog.querySelector(".mdl-timepicker__minutes");
-
-
-    void set _hour(final String date) => _elementHour.text = date;
-    void set _minute(final String year) => _elementMinute.text = year;
-
-    /// Called by the framework after the dialog was rendered but still invisible
-    //@override
-    Future _init(_) async {
-
-        _hours.clear();
-        _elementHours.children
-            .forEach((final dom.Element element) {
-            element.children.forEach((final dom.Element element) => _hours.add(element));
-        });
-
-        _minutes.clear();
-        _elementMinutes.children
-            .forEach((final dom.Element element) {
-            element.children.forEach((final dom.Element element) => _minutes.add(element));
-        });
-
-        _selectHour(dateTime.hour);
-        _selectMinute(dateTime.minute);
-
-        _logger.info("Hour: ${_hours.length}, Minutes: ${_minutes.length}");
-    }
-
-    void _selectHour(final int hour) {
-        _hours.forEach((final dom.HtmlElement element)
-            => element.classes.removeAll(_selectedHourClasses));
-
-        final int index = hour > 0 ? hour -1 : 23;
-        _hours[index].classes.addAll(_selectedHourClasses);
-
-        _elementHours.classes.where((final String selector) => selector.startsWith(_selectedHourPrefixClass))
-            .forEach((final String selector) => _elementHours.classes.remove(selector));
-
-        final String currentHourClass = "${_selectedHourPrefixClass}${index + 1}";
-        _elementHours.classes.add(currentHourClass);
-    }
-
-    void _selectMinute(final int minute) {
-        int index = (minute / 5).round();
-
-        // 60 mins
-        if(index > 11) {
-            index = 0;
-        }
-        _minutes.forEach((final dom.HtmlElement element)
-            => element.classes.removeAll(_selectedHourClasses));
-
-        _minutes[index].classes.addAll(_selectedHourClasses);
-
-        _elementMinutes.classes.where((final String selector) => selector.startsWith(_selectedMinutePrefixClass))
-            .forEach((final String selector) => _elementMinutes.classes.remove(selector));
-
-        final String currentHourClass = "${_selectedMinutePrefixClass}${index * 5}";
-        _elementMinutes.classes.add(currentHourClass);
-    }
-
-
     //- Template -----------------------------------------------------------------------------------
 
     @override
-    String template = """
+    String get template => """
     <div class="mdl-dialog mdl-timepicker">
         <div class="mdl-dialog__toolbar mdl-color--accent">
             <div class="mdl-timepicker__time">
                 <div class="mdl-timepicker__time--hour mdl-color-text--accent-contrast
                     mdl-typography--display-2 is-active"
-                        data-mdl-click="onClickDialogBarHour(\$event)">{{hour}}
+                        data-mdl-click="onClickDialogBarHour(\$event)">${hour}
                 </div>
 
                 <div class="mdl-timepicker__time--divider mdl-color-text--accent-contrast
@@ -192,7 +119,7 @@ class MaterialTimePicker extends MaterialDialog {
 
                 <div class="mdl-timepicker__time--minute mdl-color-text--accent-contrast
                     mdl-typography--display-2"
-                        data-mdl-click="onClickDialogBarMinute(\$event)">{{minute}}
+                        data-mdl-click="onClickDialogBarMinute(\$event)">${minute}
                 </div>
             </div>
         </div>
@@ -263,6 +190,89 @@ class MaterialTimePicker extends MaterialDialog {
     </div>
     """;
 
+    @override
+    Map<String, Function> get events {
+        return <String,Function>{
+            "onClose" : () => _onClose(),
+            "onCancel" : () => _onCancel(),
+            "onClickHour" : (event) => _onClickHour(event as dom.Event),
+            "onClickMinute" : (event) => _onClickMinute(event as dom.Event),
+            "onClickDialogBarHour" : (event) => _onClickDialogBarHour(event as dom.Event),
+            "onClickDialogBarMinute" : (event) => _onClickDialogBarMinute(event as dom.Event)
+        };
+    }
+
+    // - private ----------------------------------------------------------------------------------
+
+    List<String> get _selectedHourClasses => <String>["mdl-color--accent", "mdl-color-text--accent-contrast"];
+    List<String> get _showMinuteViewClasses => <String>["show-minute-view"];
+
+    String get _selectedHourPrefixClass => "mdl-timepicker__hours--";
+    String get _selectedMinutePrefixClass => "mdl-timepicker__minutes--";
+
+    dom.HtmlElement get _elementHour => dialog.querySelector(".mdl-timepicker__time--hour");
+    dom.HtmlElement get _elementMinute => dialog.querySelector(".mdl-timepicker__time--minute");
+    dom.HtmlElement get _elementHours => dialog.querySelector(".mdl-timepicker__hours");
+    dom.HtmlElement get _elementMinutes => dialog.querySelector(".mdl-timepicker__minutes");
+
+
+    void set _hour(final String date) => _elementHour.text = date;
+    void set _minute(final String year) => _elementMinute.text = year;
+
+    /// Called by the framework after the dialog was rendered but still invisible
+    //@override
+    Future _init(_) async {
+
+        _hours.clear();
+        _elementHours.children
+            .forEach((final dom.Element element) {
+            element.children.forEach((final dom.Element element) => _hours.add(element));
+        });
+
+        _minutes.clear();
+        _elementMinutes.children
+            .forEach((final dom.Element element) {
+            element.children.forEach((final dom.Element element) => _minutes.add(element));
+        });
+
+        _selectHour(dateTime.hour);
+        _selectMinute(dateTime.minute);
+
+        _logger.info("Hour: ${_hours.length}, Minutes: ${_minutes.length}");
+    }
+
+    void _selectHour(final int hour) {
+        _hours.forEach((final dom.HtmlElement element)
+        => element.classes.removeAll(_selectedHourClasses));
+
+        final int index = hour > 0 ? hour -1 : 23;
+        _hours[index].classes.addAll(_selectedHourClasses);
+
+        _elementHours.classes.where((final String selector) => selector.startsWith(_selectedHourPrefixClass))
+            .forEach((final String selector) => _elementHours.classes.remove(selector));
+
+        final String currentHourClass = "${_selectedHourPrefixClass}${index + 1}";
+        _elementHours.classes.add(currentHourClass);
+    }
+
+    void _selectMinute(final int minute) {
+        int index = (minute / 5).round();
+
+        // 60 mins
+        if(index > 11) {
+            index = 0;
+        }
+        _minutes.forEach((final dom.HtmlElement element)
+            => element.classes.removeAll(_selectedHourClasses));
+
+        _minutes[index].classes.addAll(_selectedHourClasses);
+
+        _elementMinutes.classes.where((final String selector) => selector.startsWith(_selectedMinutePrefixClass))
+            .forEach((final String selector) => _elementMinutes.classes.remove(selector));
+
+        final String currentHourClass = "${_selectedMinutePrefixClass}${index * 5}";
+        _elementMinutes.classes.add(currentHourClass);
+    }
 
 }
 

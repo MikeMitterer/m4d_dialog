@@ -63,7 +63,7 @@ class MaterialDatePicker extends MaterialDialog {
 
     // - EventHandler -----------------------------------------------------------------------------
 
-    void onClose() {
+    void _onClose() {
         _logger.fine("onClose");
 
         dateTime = new DateTime(_selectedDateTime.year,_selectedDateTime.month,_selectedDateTime.day,
@@ -72,12 +72,12 @@ class MaterialDatePicker extends MaterialDialog {
         close(MdlDialogStatus.OK);
     }
 
-    void onCancel() {
+    void _onCancel() {
         _logger.fine("onCancel");
         close(MdlDialogStatus.CANCEL);
     }
 
-    void onClickLeft(final dom.Event event) {
+    void _onClickLeft(final dom.Event event) {
         event.stopPropagation();
         _logger.fine("onClickLeft");
 
@@ -91,7 +91,7 @@ class MaterialDatePicker extends MaterialDialog {
         _updateDays();
     }
 
-    void onClickRight(final dom.Event event) {
+    void _onClickRight(final dom.Event event) {
         event.stopPropagation();
         _logger.fine("onClickRight1");
 
@@ -105,7 +105,7 @@ class MaterialDatePicker extends MaterialDialog {
         _updateDays();
     }
 
-    void onClickDay(final dom.Event event) {
+    void _onClickDay(final dom.Event event) {
         final element = event.target as dom.HtmlElement;
         final day = element.text;
 
@@ -128,7 +128,7 @@ class MaterialDatePicker extends MaterialDialog {
         _year = year;
     }
 
-    void onClickYear(final dom.Event event) {
+    void _onClickYear(final dom.Event event) {
         event.stopPropagation();
         dialog.classes.addAll(_showYearViewClasses);
         _elementYear.classes.addAll(_isActiveClasses);
@@ -143,13 +143,13 @@ class MaterialDatePicker extends MaterialDialog {
         element.scrollIntoView();
     }
 
-    void onClickDate(final dom.Event event) {
+    void _onClickDate(final dom.Event event) {
         event.stopPropagation();
 
         _activateDayView();
     }
 
-    void onClickItemInYearList(final dom.Event event) {
+    void _onClickItemInYearList(final dom.Event event) {
         final element = event.target as dom.LIElement;
         event.stopPropagation();
 
@@ -176,180 +176,27 @@ class MaterialDatePicker extends MaterialDialog {
         _month = month;
 
         _activateDayView();
-
-    }
-
-    // - private ----------------------------------------------------------------------------------
-
-    List<String> get _selectedDayClasses => <String>["mdl-color--accent", "mdl-color-text--accent-contrast"];
-    List<String> get _selectedYearClasses => <String>["mdl-color-text--accent"];
-    List<String> get _todayClasses => <String>["mdl-color-text--accent"];
-    List<String> get _showYearViewClasses => <String>["show-year-view"];
-    List<String> get _isActiveClasses => <String>["is-active"];
-
-    String get _yearIDPrefix => "mdl-datepicker-year--";
-    
-    dom.SpanElement get _elementMonth => dialog.querySelector(".mdl-datepicker__month_selection--month");
-    dom.HtmlElement get _elementDate => dialog.querySelector(".mdl-datepicker__date");
-    dom.HtmlElement get _elementYear => dialog.querySelector(".mdl-datepicker__year");
-    dom.HtmlElement get _elementDayOfMonth => dialog.querySelector(".mdl-datepicker__dom");
-    dom.HtmlElement get _elementDayOfWeek => dialog.querySelector(".mdl-datepicker__dow");
-    dom.HtmlElement get _elementYears => dialog.querySelector(".mdl-datepicker__year_view").querySelector(".mdl-list");
-
-    void set _date(final String date) => _elementDate.text = date;
-    void set _year(final String year) => _elementYear.text = year;
-    void set _month(final String month) => _elementMonth.text = month;
-
-    /// Called by the framework after the dialog was rendered but still invisible
-    Future _init(_) async {
-        _selectionMade = false;
-
-        _days.clear();
-        _elementDayOfMonth.children.forEach((final dom.Element element) {
-            element.children.forEach((final dom.Element element) => _days.add(element));
-        });
-
-        _initWeekdays();
-        _updateDays();
-
-        await _addYears();
-    }
-
-    /// Years are dynamic, we create them on the fly
-    Future _addYears() {
-        final completer = new Completer();
-        new Future(() {
-
-            // Years are already initialized
-            if(_elementYears.children.length > 0) {
-                completer.complete();
-                return;
-            }
-
-            for(int year = yearFrom;year <= yearTo;year++) {
-                final item = new dom.LIElement();
-                item.classes.add("mdl-list__item");
-                item.id = "${_yearIDPrefix}${year}";
-                item.text = year.toString();
-
-                // Remember the Stream so we can downgrade
-                eventStreams.add(
-                    item.onClick.listen(onClickItemInYearList)
-                );
-
-                _elementYears.append(item);
-            }
-
-            // DOM is slow - so we check if the last element is in the DOM
-            final String lastElementID = "#${_yearIDPrefix}${yearTo}";
-            new Timer.periodic(new Duration(milliseconds: 50), (final Timer timer) {
-                if(dialog.querySelector(lastElementID) != null) {
-                    timer.cancel();
-                    completer.complete();
-                }
-            });
-        });
-
-        return completer.future;
-    }
-
-    /// Mo, Th, ...
-    void _initWeekdays() {
-        _weekdays.clear();
-        // 
-        final String locale = Intl.shortLocale(Intl.defaultLocale);
-        final List weekdays = dateTimeSymbolMap()[locale].STANDALONESHORTWEEKDAYS;
-
-        // We start with Monday
-        for(int index = 1;index < weekdays.length;index++) {
-            _weekdays.add(weekdays[index]);
-        }
-        // Sunday comes last
-        _weekdays.add(weekdays.first);
-
-        int index = 0;
-        _elementDayOfWeek.children.forEach((final dom.Element element) {
-            element.text = _weekdays[index];
-            index++;
-        });
-    }
-
-    /// Update the table with all the days
-    void _updateDays() {
-        final firstDayInMonth = new DateTime(dateTime.year,dateTime.month);
-        final today = new DateTime.now();
-        int dayElementIndex = firstDayInMonth.weekday - 1;
-
-        void _clearDay(final int indexFrom, final int indexTo) {
-            for(int index = indexFrom;index < indexTo;index++) {
-                _days[index].text = "";
-                _days[index].classes.removeAll(_todayClasses);
-            }
-        }
-        _clearDay(0, dayElementIndex);
-        for(int index = 0;index < _daysInMonth(dateTime.year, dateTime.month);index++) {
-            _days[dayElementIndex].text = (index + 1).toString();
-
-            _days[dayElementIndex].classes.removeAll(_todayClasses);
-            _days[dayElementIndex].classes.removeAll(_selectedDayClasses);
-
-            if(_selectionMade && _selectedDateTime.year == dateTime.year
-                && _selectedDateTime.month == dateTime.month
-                && _selectedDateTime.day == (index + 1)) {
-
-                _days[dayElementIndex].classes.addAll(_selectedDayClasses);
-                _days[dayElementIndex].classes.removeAll(_todayClasses);
-                
-            } else if(today.year == dateTime.year
-                && today.month == dateTime.month
-                && today.day == (index + 1)) {
-
-                _days[dayElementIndex].classes.addAll(_todayClasses);
-            }
-
-            dayElementIndex++;
-        }
-        _clearDay(dayElementIndex, _days.length);
-    }
-
-    int _daysInMonth(final int year,final int month) {
-        bool _isLeapYear(final int year) =>
-            year % 400 == 0 || (year % 4 == 0 && year % 100 != 0);
-
-        int days = _daysPerMonth[month - 1];
-        if (month == 2 && _isLeapYear(year)) days++;
-        return days;
-    }
-
-    void _removeCurrentDaySelection() {
-        _days.forEach((final dom.HtmlElement element) => element.classes.removeAll(_selectedDayClasses));
-    }
-
-    void _activateDayView() {
-        dialog.classes.removeAll(_showYearViewClasses);
-        _elementYear.classes.removeAll(_isActiveClasses);
-        _elementDate.classes.addAll(_isActiveClasses);
     }
 
     //- Template -----------------------------------------------------------------------------------
 
     @override
-    String template = """
+    String get template => """
         <div class="mdl-dialog mdl-datepicker">
             <div class="mdl-dialog__toolbar mdl-color--accent">
                 <div class="mdl-datepicker__year mdl-color-text--accent-contrast"
-                     data-mdl-click="onClickYear(\$event)">{{year}}</div>
+                     data-mdl-click="onClickYear(\$event)">${year}</div>
                      
                 <div class="mdl-datepicker__date mdl-typography--display-1
                     mdl-color-text--accent-contrast is-active"
-                    data-mdl-click="onClickDate(\$event)">{{date}}</div>
+                    data-mdl-click="onClickDate(\$event)">${date}</div>
             </div>
             <div class="mdl-dialog__content">
                 <div class="mdl-datepicker__day_view">
                     <div class="mdl-datepicker__month_selection">
                         <button class="mdl-button mdl-button--icon" data-mdl-click="onClickLeft(\$event)">
                             <i class="mdl-icon material-icons">keyboard_arrow_left</i></button>
-                        <span class="mdl-datepicker__month_selection--month">{{month}}</span>
+                        <span class="mdl-datepicker__month_selection--month">${month}</span>
                         <button class="mdl-button mdl-button--icon" data-mdl-click="onClickRight(\$event)">
                             <i class="mdl-icon material-icons">keyboard_arrow_right</i></button>
                     </div>
@@ -433,7 +280,171 @@ class MaterialDatePicker extends MaterialDialog {
         </div>
     """;
 
+    @override
+    Map<String, Function> get events {
+        return <String,Function>{
+            "onClose" : () => _onClose(),
+            "onCancel" : () => _onCancel(),
+            "onClickLeft" : (event) => _onClickLeft(event as dom.Event),
+            "onClickRight" : (event) => _onClickRight(event as dom.Event),
+            "onClickDay" : (event) => _onClickDay(event as dom.Event),
+            "onClickYear" : (event) => _onClickYear(event as dom.Event),
+            "onClickDate" : (event) => _onClickDate(event as dom.Event),
+            "onClickItemInYearList" : (event) => _onClickItemInYearList(event as dom.Event)
+        };
+    }
 
+    // - private ----------------------------------------------------------------------------------
+
+    List<String> get _selectedDayClasses => <String>["mdl-color--accent", "mdl-color-text--accent-contrast"];
+    List<String> get _selectedYearClasses => <String>["mdl-color-text--accent"];
+    List<String> get _todayClasses => <String>["mdl-color-text--accent"];
+    List<String> get _showYearViewClasses => <String>["show-year-view"];
+    List<String> get _isActiveClasses => <String>["is-active"];
+
+    String get _yearIDPrefix => "mdl-datepicker-year--";
+
+    dom.SpanElement get _elementMonth => dialog.querySelector(".mdl-datepicker__month_selection--month");
+    dom.HtmlElement get _elementDate => dialog.querySelector(".mdl-datepicker__date");
+    dom.HtmlElement get _elementYear => dialog.querySelector(".mdl-datepicker__year");
+    dom.HtmlElement get _elementDayOfMonth => dialog.querySelector(".mdl-datepicker__dom");
+    dom.HtmlElement get _elementDayOfWeek => dialog.querySelector(".mdl-datepicker__dow");
+    dom.HtmlElement get _elementYears => dialog.querySelector(".mdl-datepicker__year_view").querySelector(".mdl-list");
+
+    void set _date(final String date) => _elementDate.text = date;
+    void set _year(final String year) => _elementYear.text = year;
+    void set _month(final String month) => _elementMonth.text = month;
+
+    /// Called by the framework after the dialog was rendered but still invisible
+    Future _init(_) async {
+        _selectionMade = false;
+
+        _days.clear();
+        _elementDayOfMonth.children.forEach((final dom.Element element) {
+            element.children.forEach((final dom.Element element) => _days.add(element));
+        });
+
+        _initWeekdays();
+        _updateDays();
+
+        await _addYears();
+    }
+
+    /// Years are dynamic, we create them on the fly
+    Future _addYears() {
+        final completer = new Completer();
+        new Future(() {
+
+            // Years are already initialized
+            if(_elementYears.children.length > 0) {
+                completer.complete();
+                return;
+            }
+
+            for(int year = yearFrom;year <= yearTo;year++) {
+                final item = new dom.LIElement();
+                item.classes.add("mdl-list__item");
+                item.id = "${_yearIDPrefix}${year}";
+                item.text = year.toString();
+
+                // Remember the Stream so we can downgrade
+                eventStreams.add(
+                    item.onClick.listen(_onClickItemInYearList)
+                );
+
+                _elementYears.append(item);
+            }
+
+            // DOM is slow - so we check if the last element is in the DOM
+            final String lastElementID = "#${_yearIDPrefix}${yearTo}";
+            new Timer.periodic(new Duration(milliseconds: 50), (final Timer timer) {
+                if(dialog.querySelector(lastElementID) != null) {
+                    timer.cancel();
+                    completer.complete();
+                }
+            });
+        });
+
+        return completer.future;
+    }
+
+    /// Mo, Th, ...
+    void _initWeekdays() {
+        _weekdays.clear();
+        //
+        final String locale = Intl.shortLocale(Intl.defaultLocale);
+        final List weekdays = dateTimeSymbolMap()[locale].STANDALONESHORTWEEKDAYS;
+
+        // We start with Monday
+        for(int index = 1;index < weekdays.length;index++) {
+            _weekdays.add(weekdays[index]);
+        }
+        // Sunday comes last
+        _weekdays.add(weekdays.first);
+
+        int index = 0;
+        _elementDayOfWeek.children.forEach((final dom.Element element) {
+            element.text = _weekdays[index];
+            index++;
+        });
+    }
+
+    /// Update the table with all the days
+    void _updateDays() {
+        final firstDayInMonth = new DateTime(dateTime.year,dateTime.month);
+        final today = new DateTime.now();
+        int dayElementIndex = firstDayInMonth.weekday - 1;
+
+        void _clearDay(final int indexFrom, final int indexTo) {
+            for(int index = indexFrom;index < indexTo;index++) {
+                _days[index].text = "";
+                _days[index].classes.removeAll(_todayClasses);
+            }
+        }
+        _clearDay(0, dayElementIndex);
+        for(int index = 0;index < _daysInMonth(dateTime.year, dateTime.month);index++) {
+            _days[dayElementIndex].text = (index + 1).toString();
+
+            _days[dayElementIndex].classes.removeAll(_todayClasses);
+            _days[dayElementIndex].classes.removeAll(_selectedDayClasses);
+
+            if(_selectionMade && _selectedDateTime.year == dateTime.year
+                && _selectedDateTime.month == dateTime.month
+                && _selectedDateTime.day == (index + 1)) {
+
+                _days[dayElementIndex].classes.addAll(_selectedDayClasses);
+                _days[dayElementIndex].classes.removeAll(_todayClasses);
+
+            } else if(today.year == dateTime.year
+                && today.month == dateTime.month
+                && today.day == (index + 1)) {
+
+                _days[dayElementIndex].classes.addAll(_todayClasses);
+            }
+
+            dayElementIndex++;
+        }
+        _clearDay(dayElementIndex, _days.length);
+    }
+
+    int _daysInMonth(final int year,final int month) {
+        bool _isLeapYear(final int year) =>
+            year % 400 == 0 || (year % 4 == 0 && year % 100 != 0);
+
+        int days = _daysPerMonth[month - 1];
+        if (month == 2 && _isLeapYear(year)) days++;
+        return days;
+    }
+
+    void _removeCurrentDaySelection() {
+        _days.forEach((final dom.HtmlElement element) => element.classes.removeAll(_selectedDayClasses));
+    }
+
+    void _activateDayView() {
+        dialog.classes.removeAll(_showYearViewClasses);
+        _elementYear.classes.removeAll(_isActiveClasses);
+        _elementDate.classes.addAll(_isActiveClasses);
+    }
 }
 
 

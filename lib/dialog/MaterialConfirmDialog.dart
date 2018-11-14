@@ -6,27 +6,6 @@ class MdlConfirmDialog extends MaterialDialog {
     static const String _DEFAULT_YES_BUTTON = "Yes";
     static const String _DEFAULT_NO_BUTTON = "No";
 
-    @override
-    String template = """
-        <div class="mdl-dialog">
-          <div class="mdl-dialog__content">
-            {{#hasTitle}}
-            <h5>{{title}}</h5>
-            {{/hasTitle}}
-            <p>{{text}}</p>
-          </div>
-          <div class="mdl-dialog__actions" layout="row">
-              <button class="mdl-button" data-mdl-click="onNo()">
-                  {{noButton}}
-              </button>
-              <button class="mdl-button mdl-button--colored" data-mdl-click="onYes()">
-                  {{yesButton}}
-              </button>
-          </div>
-        </div>
-        """;
-
-
     String title = "";
     String text = "";
     String yesButton = _DEFAULT_YES_BUTTON;
@@ -49,18 +28,46 @@ class MdlConfirmDialog extends MaterialDialog {
         return this;
     }
 
-    bool get hasTitle => (title != null && title.isNotEmpty);
 
     // - EventHandler -----------------------------------------------------------------------------
-
-    void onYes() {
+    void _onYes() {
         close(MdlDialogStatus.YES);
     }
 
-    void onNo() {
+    void _onNo() {
         close(MdlDialogStatus.NO);
     }
 
+    // - Template ---------------------------------------------------------------------------------
+
+    @override
+    String get template => """
+        <div class="mdl-dialog">
+          <div class="mdl-dialog__content">
+            ${_hasTitle ? '<h5>$title</h5>' : ''}
+            <p>${text}</p>
+          </div>
+          <div class="mdl-dialog__actions" layout="row">
+              <button class="mdl-button" data-mdl-click="onNo()">
+                  ${noButton}
+              </button>
+              <button class="mdl-button mdl-button--colored" data-mdl-click="onYes()">
+                  ${yesButton}
+              </button>
+          </div>
+        </div>
+        """;
+
+    @override
+    Map<String, Function> get events {
+        return <String,Function>{
+            "onNo" :  () => _onNo(),
+            "onYes" :  () => _onYes()
+        };
+    }
+
+
     // - private ----------------------------------------------------------------------------------
+    bool get _hasTitle => (title != null && title.isNotEmpty);
 
 }
