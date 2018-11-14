@@ -20,22 +20,22 @@ dependencies:
   meta: ^1.1.0
 
   m4d_core: '>=0.1.0 <1.0.0'
-  # path: /Volumes/Daten/DevLocal/DevDart/m4d/m4d_core
+    # path: /Volumes/Daten/DevLocal/DevDart/m4d/m4d_core
 
   m4d_flux: '>=0.1.0 <1.0.0'
-  # path: /Volumes/Daten/DevLocal/DevDart/m4d/m4d_flux
+    # path: /Volumes/Daten/DevLocal/DevDart/m4d/m4d_flux
 
   m4d_components: '>=0.1.0 <1.0.0'
-  # path: /Volumes/Daten/DevLocal/DevDart/m4d/m4d_components
+    # path: /Volumes/Daten/DevLocal/DevDart/m4d/m4d_components
 
-  m4d_template: #'>=0.1.0 <1.0.0'
-   path: /Volumes/Daten/DevLocal/DevDart/m4d/m4d_template
+  m4d_template: '>=0.1.0 <1.0.0'
+    # path: /Volumes/Daten/DevLocal/DevDart/m4d/m4d_template
 
-  m4d_animation: #'>=0.1.0 <1.0.0'
-   path: /Volumes/Daten/DevLocal/DevDart/m4d/m4d_animation
+  m4d_animation: '>=0.1.0 <1.0.0'
+    # path: /Volumes/Daten/DevLocal/DevDart/m4d/m4d_animation
 
-  m4d_translate: #'>=0.1.0 <1.0.0'
-   path: /Volumes/Daten/DevLocal/DevDart/m4d/m4d_translate
+  m4d_translate: '>=0.1.0 <1.0.0'
+    # path: /Volumes/Daten/DevLocal/DevDart/m4d/m4d_translate
 
 dev_dependencies:
   test: any

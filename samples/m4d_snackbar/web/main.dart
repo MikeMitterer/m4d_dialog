@@ -1,21 +1,27 @@
 import "dart:html" as dom;
 
+import 'package:logging/logging.dart';
 import 'package:console_log_handler/console_log_handler.dart';
 
-import 'package:mdl/mdl.dart';
-import "package:mdl/mdldialog.dart";
+import 'package:m4d_core/m4d_ioc.dart' as ioc;
 
-import 'main.reflectable.dart';
+import 'package:m4d_components/m4d_components.dart';
+import 'package:m4d_dialog/m4d_dialog.dart';
 
-main() async {
+void main() async {
+    configLogging(show: Level.INFO);
+
+    // Initialize M4D
+    ioc.IOCContainer.bindModules([
+        DialogModule()
+    ]);
+
+    await componentHandler().upgrade();
+    Future(_bindEvents);
+}
+
+void _bindEvents() {
     final Logger _logger = new Logger('dialog.Main');
-
-    configLogging();
-    initializeReflectable();
-
-    registerMdl();
-
-    await componentFactory().run();
 
     final MaterialButton btnToast = MaterialButton.widget(dom.querySelector("#toast"));
     final MaterialButton btnWithAction = MaterialButton.widget(dom.querySelector("#withAction"));

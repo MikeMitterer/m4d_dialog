@@ -1,5 +1,5 @@
 //---
-// Copyright (c) 2015, Michael Mitterer (office@mikemitterer.at),
+// Copyright (c) 2018, Michael Mitterer (office@mikemitterer.at),
 // IT-Consulting and Development Limited.
 //
 // All Rights Reserved.
@@ -17,7 +17,8 @@
 // limitations under the License.
 //
 
-//@import "../../../lib/assets/styles/material-design-lite";
+@import "package:m4d_components/assets/styles/material-design-lite";
+@import "app";
 
 .demo-page--snackbar, .demo-section--snackbar {
     .demo-button {

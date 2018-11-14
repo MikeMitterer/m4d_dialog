@@ -9,7 +9,7 @@ environment:
 
 dependencies:
 
-  m4d_directive:
+  m4d_dialog:
     path: ../..
 
   m4d_components: '>=0.1.0 <1.0.0'

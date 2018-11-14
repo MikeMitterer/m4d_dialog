@@ -43,17 +43,7 @@ class MaterialSnackbar extends MaterialDialog {
 
     static const String DEFAULT_CONFIRM_BUTTON = "OK";
 
-    @override
-    String template = """
-        <div class="mdl-snackbar {{lambdas.classes}}">
-            <span class="mdl-snackbar__flex">{{text}}</span>
-            {{#hasConfirmButton}}
-                <button class="mdl-button mdl-js-button mdl-button--colored" data-mdl-click="onClose()" autofocus>
-                    {{confirmButton}}
-                </button>
-            {{/hasConfirmButton}}
-        </div>
-    """;
+
 
     static const int LONG_DELAY = 3500;
     static const int SHORT_DELAY = 2000;
@@ -88,16 +78,13 @@ class MaterialSnackbar extends MaterialDialog {
     /// The current Snackbar waits for user interaction
     bool get waitingForConfirmation => _confirmationID.isNotEmpty;
 
-    /// The template checks it it should show a button or not
-    bool get hasConfirmButton => confirmButton != null && confirmButton.isNotEmpty;
-
     @override
     /// if there is already a Snackbar open - it will be closed
     Future<MdlDialogStatus> show({ Duration timeout, FutureOr onDialogInit(final String dialogId) }) {
         Validate.isTrue(!waitingForConfirmation,"There is alread a Snackbar waiting for confirmation!!!!");
 
         return close(MdlDialogStatus.CLOSED_VIA_NEXT_SHOW).then( (_) {
-            if(!hasConfirmButton) {
+            if(!_hasConfirmButton) {
                 if(timeout == null) {
                     timeout = new Duration(milliseconds: SHORT_DELAY);
                 }
@@ -110,10 +97,30 @@ class MaterialSnackbar extends MaterialDialog {
 
     // - EventHandler -----------------------------------------------------------------------------
 
-    void onClose() {
+    void _onClose() {
         Validate.notBlank(_confirmationID, "onClose must have a _confirmationID set - but was blank");
 
         close(MdlDialogStatus.CONFIRMED);
+    }
+
+    // - Template ---------------------------------------------------------------------------------
+
+    @override
+    String get template => """
+        <div class="mdl-snackbar ${_snackbarClasses()}">
+            <span class="mdl-snackbar__flex">${text}</span>
+            ${_hasConfirmButton ? '''
+                <button class="mdl-button mdl-js-button mdl-button--colored" data-mdl-click="onClose()" autofocus>
+                    ${confirmButton}
+                </button>''' : ''}
+        </div>
+    """;
+
+    @override
+    Map<String, Function> get events {
+        return <String,Function>{
+            "onClose" :  () => _onClose()
+        };
     }
 
     // - private ----------------------------------------------------------------------------------
@@ -130,31 +137,32 @@ class MaterialSnackbar extends MaterialDialog {
     Future _init(final String id) async {
         Validate.notBlank(id);
         _confirmationID = id;
-
-        // Hacky but _init must return a Future
-        //return new Future(() => true);
     }
 
     void _clearConfirmationCheck() {
         _confirmationID = "";
     }
 
-//    String _snackbarClasses(final LambdaContext _) {
-//        final List<String> classes = new List<String>();
-//
-//        void _addIf(final List<String> classes,final bool check,final String classToAdd) {
-//            if(check) {
-//                classes.add(classToAdd);
-//            }
-//        }
-//
-//        _addIf(classes,position.top,"mdl-snackbar--top");
-//        _addIf(classes,position.right,"mdl-snackbar--right");
-//        _addIf(classes,position.left,"mdl-snackbar--left");
-//        _addIf(classes,position.bottom,"mdl-snackbar--bottom");
-//
-//        _addIf(classes,waitingForConfirmation,"waiting-for-confirmation");
-//
-//        return classes.join(" ");
-//    }
+    /// The template checks it it should show a button or not
+    bool get _hasConfirmButton => confirmButton != null && confirmButton.isNotEmpty;
+
+
+    String _snackbarClasses() {
+        final List<String> classes = new List<String>();
+
+        void _addIf(final List<String> classes,final bool check,final String classToAdd) {
+            if(check) {
+                classes.add(classToAdd);
+            }
+        }
+
+        _addIf(classes,position.top,"mdl-snackbar--top");
+        _addIf(classes,position.right,"mdl-snackbar--right");
+        _addIf(classes,position.left,"mdl-snackbar--left");
+        _addIf(classes,position.bottom,"mdl-snackbar--bottom");
+
+        _addIf(classes,waitingForConfirmation,"waiting-for-confirmation");
+
+        return classes.join(" ");
+    }
 }

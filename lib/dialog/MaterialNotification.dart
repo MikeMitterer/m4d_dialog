@@ -17,7 +17,7 @@ class _NotificationConfig extends DialogConfig {
         autoClosePossible: true,
         appendNewDialog: true,
         acceptEscToClose: false,
-        closeAnimation: new MdlAnimation.fromStock(StockAnimation.MoveUpAndDisappear)
+        closeAnimation: MdlAnimation.fromStock(StockAnimation.MoveUpAndDisappear)
     );
 }
 
@@ -85,15 +85,9 @@ class MaterialNotification extends MaterialDialog {
         return this;
     }
 
-    bool get hasTitle => title != null && title.isNotEmpty;
-    bool get hasSubTitle => subtitle != null && subtitle.isNotEmpty;
-    bool get hasContent => content != null && content.isNotEmpty;
-
     /// Overwrites the default behaviour which is auto-closable by default
     void set autoClose(final bool enabled) { _autoClose = enabled;  }
     bool get autoClose => _autoClose;
-
-    // - EventHandler -----------------------------------------------------------------------------
 
     @override
     // TODO: Params are not used - change parent function...
@@ -101,62 +95,70 @@ class MaterialNotification extends MaterialDialog {
         return super.show(timeout: (_autoClose == true ? new Duration(milliseconds: this.timeout ): null ));
     }
 
-    void onClose() {
+    // - EventHandler -----------------------------------------------------------------------------
+
+    void _onClose() {
         _logger.info("onClose - Notification");
         close(MdlDialogStatus.CONFIRMED);
     }
 
-    // - private ----------------------------------------------------------------------------------
-
-//    String _notificationType(final LambdaContext _) {
-//
-//        switch(type) {
-//            case NotificationType.DEBUG:
-//                return "debug";
-//
-//            case NotificationType.INFO:
-//                return "info";
-//
-//            case NotificationType.WARNING:
-//                return "warning";
-//
-//            case NotificationType.ERROR:
-//                return "error";
-//
-//            default:
-//                return "info";
-//        }
-//    }
-
     // - Template ---------------------------------------------------------------------------------
 
     @override
-    String template = """
-    <div class="mdl-notification mdl-notification--{{lambdas.type}} mdl-shadow--3dp">
+    String get template => """
+    <div class="mdl-notification mdl-notification--${_notificationType()} mdl-shadow--3dp">
             <i class="mdl-icon material-icons mdl-notification__close" data-mdl-click="onClose()">clear</i>
             <div class="mdl-notification__content">
-            {{#hasTitle}}
+            ${_hasTitle ? '''
             <div class="mdl-notification__title">
                 <div class="mdl-notification__avatar material-icons"></div>
                 <div class="mdl-notification__headline">
-                    <h1>{{title}}</h1>
-                    {{#hasSubTitle}}
-                        <h2>{{subtitle}}</h2>
-                    {{/hasSubTitle}}
+                    <h1>${title}</h1>
+                    ${_hasSubTitle ? '<h2>${subtitle}</h2>' : ''}
                 </div>
-            </div>
-            {{/hasTitle}}
-            {{#hasContent}}
+            </div>''' : ''}
+            ${_hasContent ? '''
                 <div class="mdl-notification__text">
-                {{^hasTitle}}
-                    <span class="mdl-notification__avatar material-icons"></span>
-                {{/hasTitle}}
+                ${_hasTitle ?
+                    '<span class="mdl-notification__avatar material-icons"></span>' : ''}
                 <span>
-                    {{content}}
+                    ${content}
                 </span>
-                </div>
-            {{/hasContent}}
+                </div>''' : ''}
             </div>
     </div>
     """;
+
+    @override
+    Map<String, Function> get events {
+        return <String,Function>{
+            "onClose" :  () => _onClose()
+        };
+    }
+
+    // - private ----------------------------------------------------------------------------------
+
+    bool get _hasTitle => title != null && title.isNotEmpty;
+    bool get _hasSubTitle => subtitle != null && subtitle.isNotEmpty;
+    bool get _hasContent => content != null && content.isNotEmpty;
+
+    String _notificationType() {
+
+        switch(type) {
+            case NotificationType.DEBUG:
+                return "debug";
+
+            case NotificationType.INFO:
+                return "info";
+
+            case NotificationType.WARNING:
+                return "warning";
+
+            case NotificationType.ERROR:
+                return "error";
+
+            default:
+                return "info";
+        }
+    }
 }

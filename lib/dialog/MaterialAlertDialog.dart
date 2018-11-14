@@ -39,7 +39,7 @@ class MaterialAlertDialog extends MaterialDialog {
     String get template => """
         <div class="mdl-dialog">
           <div class="mdl-dialog__content">
-            ${hasTitle ? "<h5>$title</h5>" : ""}
+            ${hasTitle ? '<h5>$title</h5>' : ''}
             <p>${text}</p>
           </div>
           <div class="mdl-dialog__actions" layout="row">
