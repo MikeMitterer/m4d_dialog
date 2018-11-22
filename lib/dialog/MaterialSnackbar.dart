@@ -105,23 +105,23 @@ class MaterialSnackbar extends MaterialDialog {
 
     // - Template ---------------------------------------------------------------------------------
 
-    @override
-    String get template => """
-        <div class="mdl-snackbar ${_snackbarClasses()}">
-            <span class="mdl-snackbar__flex">${text}</span>
-            ${_hasConfirmButton ? '''
-                <button class="mdl-button mdl-js-button mdl-button--colored" data-mdl-click="onClose()" autofocus>
-                    ${confirmButton}
-                </button>''' : ''}
-        </div>
-    """;
+@override
+String get template => """
+    <div class="mdl-snackbar ${_snackbarClasses()}">
+        <span class="mdl-snackbar__flex">${text}</span>
+        ${_hasConfirmButton ? '''
+            <button class="mdl-button mdl-js-button mdl-button--colored" data-mdl-click="onClose()" autofocus>
+                ${confirmButton}
+            </button>''' : ''}
+    </div>
+""";
 
-    @override
-    Map<String, Function> get events {
-        return <String,Function>{
-            "onClose" :  () => _onClose()
-        };
-    }
+@override
+Map<String, Function> get events {
+    return <String,Function>{
+        "onClose" :  () => _onClose()
+    };
+}
 
     // - private ----------------------------------------------------------------------------------
 
