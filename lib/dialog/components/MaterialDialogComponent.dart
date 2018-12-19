@@ -50,7 +50,7 @@ class MaterialDialogComponent extends MdlComponent {
     //static const _MaterialDialogComponentConstant _constant = const _MaterialDialogComponentConstant();
     static const _MaterialDialogComponentCssClasses _cssClasses = const _MaterialDialogComponentCssClasses();
 
-    MaterialDialogComponent.fromElement(final dom.HtmlElement element,final ioc.IOCContainer iocContainer)
+    MaterialDialogComponent.fromElement(final dom.HtmlElement element,final ioc.Container iocContainer)
         : super(element,iocContainer) {
 
         _init();
@@ -100,7 +100,7 @@ class MaterialDialogComponent extends MdlComponent {
 void _registerMaterialDialogComponent() {
     final MdlConfig config = new MdlWidgetConfig<MaterialDialogComponent>(
         _MaterialDialogComponentConstant.WIDGET_SELECTOR,
-            (final dom.HtmlElement element,final ioc.IOCContainer iocContainer)
+            (final dom.HtmlElement element,final ioc.Container iocContainer)
                 => new MaterialDialogComponent.fromElement(element,iocContainer)
     );
     

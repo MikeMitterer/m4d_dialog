@@ -67,7 +67,7 @@ void registerMdlDialogComponents() {
     _registerMaterialDialogComponent();
 }
 
-class DialogModule extends ioc.IOCModule {
+class DialogModule extends ioc.Module {
 
     @override
     configure() {
@@ -78,7 +78,7 @@ class DialogModule extends ioc.IOCModule {
     }
 
     @override
-    List<ioc.IOCModule> get dependsOn => [
+    List<ioc.Module> get dependsOn => [
         CoreComponentsModule(),
         TranslationModule()
     ];

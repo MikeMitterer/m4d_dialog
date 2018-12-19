@@ -12,7 +12,7 @@ void main() async {
     configLogging(show: Level.INFO);
 
     // Initialize M4D
-    ioc.IOCContainer.bindModules([
+    ioc.Container.bindModules([
         DialogModule()
     ]);
 

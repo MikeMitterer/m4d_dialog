@@ -188,7 +188,7 @@ main() async {
     (dom.querySelector("head") as dom.HeadElement).lang = locale;
 
     // Initialize M4D
-    ioc.IOCContainer.bindModules([
+    ioc.Container.bindModules([
         DialogModule()
     ]).bind(coreService.Application).to(Application());
 
