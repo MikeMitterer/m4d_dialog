@@ -1,6 +1,11 @@
 # Change Log for m4d_dialog
 Material Design 4 Dart - Dialogs
 
+## [Unreleased](http://github.com/mikemitterer/m4d_dialog/compare/v0.2...HEAD)
+
+### Refactor
+* Fighting against Darts broken dependency-management-system [c3cf4ad](https://github.com/mikemitterer/m4d_dialog/commit/c3cf4adb285f6cd67dc9942cb3686cda7852de58)
+
 ## [v0.1](http://github.com/mikemitterer/m4d_dialog/compare/v0.1) - 2018-11-14
 
 ### Docs
