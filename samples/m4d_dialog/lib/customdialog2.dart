@@ -22,7 +22,6 @@ library mdl_dialog_sample.customdialog2;
 import 'dart:async';
 import 'dart:html' as dom;
 
-import 'package:intl/intl.dart';
 import 'package:m4d_dialog/m4d_dialog.dart';
 
 class CustomDialog2 extends MaterialDialog {
